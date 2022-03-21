@@ -13,28 +13,35 @@
  * limitations under the License.
 */
 
-using QuantConnect.ToolBox;
-using System.Collections.Generic;
+using Newtonsoft.Json;
+using QuantConnect.Brokerages.Bitfinex.Converters;
 
-namespace QuantConnect.TemplateBrokerage.ToolBox
+namespace QuantConnect.Brokerages.Bitfinex.Messages
 {
     /// <summary>
-    /// Template Brokerage implementation of <see cref="IExchangeInfoDownloader"/>
+    /// Account wallet balance
     /// </summary>
-    public class TemplateExchangeInfoDownloader : IExchangeInfoDownloader
+    [JsonConverter(typeof(WalletConverter))]
+    public class Wallet
     {
         /// <summary>
-        /// Market
+        /// Wallet name (exchange, margin, funding)
         /// </summary>
-        public string Market => throw new System.NotImplementedException();
+        public string Type { get; set; }
 
         /// <summary>
-        /// Get exchange info coma-separated data
+        /// Currency (e.g. USD, ...)
         /// </summary>
-        /// <returns>Enumerable of exchange info for this market</returns>
-        public IEnumerable<string> Get()
-        {
-            throw new System.NotImplementedException();
-        }
+        public string Currency { get; set; }
+
+        /// <summary>
+        /// Wallet balance
+        /// </summary>
+        public decimal Balance { get; set; }
+
+        /// <summary>
+        /// Unsettled interest
+        /// </summary>
+        public decimal UnsettledInterest { get; set; }
     }
 }
