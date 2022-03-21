@@ -63,9 +63,9 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
         private static TestCaseData[] MakerOrders => new[]
         {
             new TestCaseData(new LimitOrderTestParameters(Symbol, HighPrice, LowPrice)),
-            new TestCaseData(new LimitOrderTestParameters(Symbol, HighPrice, LowPrice) { OrderSubmissionData = OrderSubmissionData}),
+            new TestCaseData(new LimitOrderTestParameters(Symbol, HighPrice, LowPrice, orderSubmissionData: OrderSubmissionData)),
             new TestCaseData(new LimitOrderTestParameters(Symbol, HighPrice, LowPrice, new BitfinexOrderProperties())),
-            new TestCaseData(new LimitOrderTestParameters(Symbol, LowPrice, HighPrice, new BitfinexOrderProperties() { PostOnly = true }){ OrderSubmissionData = OrderSubmissionData}),
+            new TestCaseData(new LimitOrderTestParameters(Symbol, LowPrice, HighPrice, new BitfinexOrderProperties() { PostOnly = true }, orderSubmissionData: OrderSubmissionData)),
             new TestCaseData(new LimitOrderTestParameters(Symbol, HighPrice, LowPrice, new BitfinexOrderProperties() { PostOnly = true }))
         };
 
@@ -73,7 +73,7 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
         {
             new TestCaseData(new MarketOrderTestParameters(Symbol)),
             new TestCaseData(new MarketOrderTestParameters(Symbol, new BitfinexOrderProperties() { PostOnly = true })),
-            new TestCaseData(new LimitOrderTestParameters(Symbol, LowPrice, HighPrice) { OrderSubmissionData = OrderSubmissionData}),
+            new TestCaseData(new LimitOrderTestParameters(Symbol, LowPrice, HighPrice, orderSubmissionData: OrderSubmissionData)),
             new TestCaseData(new LimitOrderTestParameters(Symbol, HighPrice, LowPrice, new BitfinexOrderProperties() { Hidden = true })),
             new TestCaseData(new LimitOrderTestParameters(Symbol, HighPrice, LowPrice, new BitfinexOrderProperties() { PostOnly = true, Hidden = true }))
         };
