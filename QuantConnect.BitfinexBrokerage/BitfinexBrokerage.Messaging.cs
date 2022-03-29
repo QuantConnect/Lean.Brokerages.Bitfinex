@@ -202,6 +202,7 @@ namespace QuantConnect.Brokerages.Bitfinex
             {
                 SubscribeAuth();
             };
+            ValidateSubscription();
         }
 
         private long GetNextClientOrderId()
