@@ -28,6 +28,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Lean\Tests\QuantConnect.Tests.csproj" />
+      <ProjectReference Include="..\QuantConnect.BitfinexBrokerage.ToolBox\QuantConnect.BitfinexBrokerage.ToolBox.csproj" />
       <ProjectReference Include="..\QuantConnect.BitfinexBrokerage\QuantConnect.BitfinexBrokerage.csproj" />
     </ItemGroup>
 

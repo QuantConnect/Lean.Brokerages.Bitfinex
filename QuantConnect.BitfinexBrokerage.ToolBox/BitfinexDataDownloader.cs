@@ -95,7 +95,7 @@ namespace QuantConnect.ToolBox.BitfinexDownloader
         /// </summary>
         /// <param name="ticker"></param>
         /// <returns></returns>
-        internal Symbol GetSymbol(string ticker)
+        public Symbol GetSymbol(string ticker)
         {
             if (_symbolMapper.IsKnownBrokerageSymbol(ticker))
             {
