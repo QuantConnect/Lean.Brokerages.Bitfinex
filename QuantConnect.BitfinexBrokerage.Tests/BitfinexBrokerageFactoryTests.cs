@@ -14,22 +14,20 @@
 */
 
 using NUnit.Framework;
+using QuantConnect.Brokerages.Bitfinex;
+using QuantConnect.Interfaces;
+using QuantConnect.Util;
 
-namespace QuantConnect.TemplateBrokerage.Tests
+namespace QuantConnect.Tests.Brokerages.Bitfinex
 {
-    [TestFixture, Ignore("Not implemented")]
-    public class TemplateBrokerageSymbolMapperTests
+    [TestFixture]
+    public class BitfinexBrokerageFactoryTests
     {
         [Test]
-        public void ReturnsCorrectLeanSymbol()
+        public void InitializesFactoryFromComposer()
         {
-
-        }
-
-        [Test]
-        public void ReturnsCorrectBrokerageSymbol()
-        {
-
+            using var factory = Composer.Instance.Single<IBrokerageFactory>(instance => instance.BrokerageType == typeof(BitfinexBrokerage));
+            Assert.IsNotNull(factory);
         }
     }
 }
