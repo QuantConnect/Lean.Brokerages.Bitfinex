@@ -27,7 +27,6 @@ using QuantConnect.Lean.Engine.DataFeeds;
 namespace QuantConnect.Tests.Brokerages.Bitfinex
 {
     [TestFixture]
-    [Explicit("This test requires a configured Bitfinex account")]
     public partial class BitfinexBrokerageTests : BrokerageTests
     {
         /// <summary>
@@ -108,42 +107,49 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
         protected override decimal GetDefaultQuantity() => 0.04m;
 
         [Test, TestCaseSource(nameof(OrderParameters))]
+        [Ignore("Ignore a test")]
         public override void CancelOrders(OrderTestParameters parameters)
         {
             base.CancelOrders(parameters);
         }
 
         [Test, TestCaseSource(nameof(OrderParameters))]
+        [Ignore("Ignore a test")]
         public override void LongFromZero(OrderTestParameters parameters)
         {
             base.LongFromZero(parameters);
         }
 
         [Test, TestCaseSource(nameof(OrderParameters))]
+        [Ignore("Ignore a test")]
         public override void CloseFromLong(OrderTestParameters parameters)
         {
             base.CloseFromLong(parameters);
         }
 
         [Test, TestCaseSource(nameof(OrderParameters))]
+        [Ignore("Ignore a test")]
         public override void ShortFromZero(OrderTestParameters parameters)
         {
             base.ShortFromZero(parameters);
         }
 
         [Test, TestCaseSource(nameof(OrderParameters))]
+        [Ignore("Ignore a test")]
         public override void CloseFromShort(OrderTestParameters parameters)
         {
             base.CloseFromShort(parameters);
         }
 
         [Test, TestCaseSource(nameof(OrderParameters))]
+        [Ignore("Ignore a test")]
         public override void ShortFromLong(OrderTestParameters parameters)
         {
             base.ShortFromLong(parameters);
         }
 
         [Test, TestCaseSource(nameof(OrderParameters))]
+        [Ignore("Ignore a test")]
         public override void LongFromShort(OrderTestParameters parameters)
         {
             base.LongFromShort(parameters);
