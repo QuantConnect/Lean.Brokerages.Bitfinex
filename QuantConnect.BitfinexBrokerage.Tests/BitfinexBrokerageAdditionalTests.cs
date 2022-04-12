@@ -27,7 +27,6 @@ using RestSharp;
 namespace QuantConnect.Tests.Brokerages.Bitfinex
 {
     [TestFixture]
-    [Explicit("This test requires a configured Bitfinex account")]
     public class BitfinexBrokerageAdditionalTests
     {
         private BitfinexBrokerage _brokerage;

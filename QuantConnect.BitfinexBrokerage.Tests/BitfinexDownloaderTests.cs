@@ -20,7 +20,6 @@ using QuantConnect.ToolBox.BitfinexDownloader;
 namespace QuantConnect.Tests.Brokerages.Bitfinex
 {
     [TestFixture]
-    [Explicit("This test requires a configured Bitfinex account")]
     public class BitfinexDownloaderTests
     {
         [TestCase("--app=BFXDL --from-date=20171101-00:00:00 --tickers=1INCHUSD --resolution=Minute", 1)]
