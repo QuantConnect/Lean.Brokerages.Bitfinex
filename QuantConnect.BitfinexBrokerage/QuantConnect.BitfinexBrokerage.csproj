@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Product>QuantConnect.BitfinexBrokerage</Product>
     <AssemblyName>QuantConnect.BitfinexBrokerage</AssemblyName>
     <RootNamespace>QuantConnect.BitfinexBrokerage</RootNamespace>
