@@ -45,6 +45,7 @@ namespace QuantConnect.Brokerages.Bitfinex
     [BrokerageFactory(typeof(BitfinexBrokerageFactory))]
     public partial class BitfinexBrokerage : BaseWebsocketsBrokerage, IDataQueueHandler
     {
+        private bool _loggedSupportsOnlyTradeBars;
         private readonly SymbolPropertiesDatabaseSymbolMapper _symbolMapper = new SymbolPropertiesDatabaseSymbolMapper(Market.Bitfinex);
 
         #region IBrokerage
@@ -359,6 +360,17 @@ namespace QuantConnect.Brokerages.Bitfinex
             {
                 OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "InvalidDateRange",
                     "The history request start date must precede the end date, no history returned"));
+                yield break;
+            }
+
+            if (request.TickType != TickType.Trade)
+            {
+                if (!_loggedSupportsOnlyTradeBars)
+                {
+                    _loggedSupportsOnlyTradeBars = true;
+                    _algorithm?.Debug("Warning: Bitfinex history provider only supports trade information, does not support quotes.");
+                    Log.Error("BitfinexBrokerage.GetHistory(): Bitfinex only supports TradeBars");
+                }
                 yield break;
             }
 

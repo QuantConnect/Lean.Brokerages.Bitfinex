@@ -18,12 +18,12 @@ using System.Linq;
 using NodaTime;
 using NUnit.Framework;
 using QuantConnect.Data;
-using QuantConnect.Data.Market;
 using QuantConnect.Lean.Engine.HistoricalData;
 using QuantConnect.Logging;
 using QuantConnect.Securities;
 using QuantConnect.Brokerages.Bitfinex;
 using QuantConnect.Lean.Engine.DataFeeds;
+using QuantConnect.Util;
 
 namespace QuantConnect.Tests.Brokerages.Bitfinex
 {
@@ -39,30 +39,35 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
             return new[]
             {
                 // valid
-                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, false, false),
-                new TestCaseData(StaticSymbol, Resolution.Hour, Time.OneDay, false, false),
-                new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(15), false, false),
+                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, false, false, TickType.Trade),
+                new TestCaseData(StaticSymbol, Resolution.Hour, Time.OneDay, false, false, TickType.Trade),
+                new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(15), false, false, TickType.Trade),
+
+                // invalid data types, no error, empty result
+                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, true, false, TickType.Quote),
+                new TestCaseData(StaticSymbol, Resolution.Tick, Time.OneMinute, true, false, TickType.Quote),
+                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, true, false, TickType.OpenInterest),
 
                 // invalid resolution, no error, empty result
-                new TestCaseData(StaticSymbol, Resolution.Tick, TimeSpan.FromSeconds(15), true, false),
-                new TestCaseData(StaticSymbol, Resolution.Second, Time.OneMinute, true, false),
+                new TestCaseData(StaticSymbol, Resolution.Tick, TimeSpan.FromSeconds(15), true, false, TickType.Trade),
+                new TestCaseData(StaticSymbol, Resolution.Second, Time.OneMinute, true, false, TickType.Trade),
 
                 // invalid period, no error, empty result
-                new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(-15), true, false),
+                new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(-15), true, false, TickType.Trade),
 
                 // invalid symbol, throws "System.ArgumentException : Unknown symbol: XYZ"
                 new TestCaseData(Symbol.Create("XYZ", SecurityType.Crypto, Market.Bitfinex),
-                    Resolution.Daily, TimeSpan.FromDays(15), true, true),
+                    Resolution.Daily, TimeSpan.FromDays(15), true, true, TickType.Trade),
 
                 // invalid security type, no error, empty result
-                new TestCaseData(Symbols.EURUSD, Resolution.Daily, TimeSpan.FromDays(15), true, false)
+                new TestCaseData(Symbols.EURUSD, Resolution.Daily, TimeSpan.FromDays(15), true, false, TickType.Trade)
             };
         }
             
 
         [Test]
         [TestCaseSource(nameof(History))]
-        public void GetsHistory(Symbol symbol, Resolution resolution, TimeSpan period, bool shouldBeEmpty, bool throwsException)
+        public void GetsHistory(Symbol symbol, Resolution resolution, TimeSpan period, bool shouldBeEmpty, bool throwsException, TickType tickType)
         {
             TestDelegate test = () =>
             {
@@ -78,7 +83,7 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
                 {
                     new HistoryRequest(now.Add(-period),
                                        now,
-                                       typeof(TradeBar),
+                                       LeanData.GetDataType(resolution, tickType),
                                        symbol,
                                        resolution,
                                        SecurityExchangeHours.AlwaysOpen(TimeZones.Utc),
@@ -87,7 +92,7 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
                                        false,
                                        false,
                                        DataNormalizationMode.Adjusted,
-                                       TickType.Trade)
+                                       tickType)
                 };
 
                 // 'GetBrokerageSymbol' method called inside 'GetHistory' may throw an ArgumentException for invalid symbol supplied
