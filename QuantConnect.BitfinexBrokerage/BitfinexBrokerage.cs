@@ -45,6 +45,7 @@ namespace QuantConnect.Brokerages.Bitfinex
     [BrokerageFactory(typeof(BitfinexBrokerageFactory))]
     public partial class BitfinexBrokerage : BaseWebsocketsBrokerage, IDataQueueHandler
     {
+        private bool _loggedSupportsOnlyTradeBars;
         private readonly SymbolPropertiesDatabaseSymbolMapper _symbolMapper = new SymbolPropertiesDatabaseSymbolMapper(Market.Bitfinex);
 
         #region IBrokerage
@@ -362,6 +363,17 @@ namespace QuantConnect.Brokerages.Bitfinex
                 yield break;
             }
 
+            if (request.TickType != TickType.Trade)
+            {
+                if (!_loggedSupportsOnlyTradeBars)
+                {
+                    _loggedSupportsOnlyTradeBars = true;
+                    _algorithm?.Debug("Warning: Bitfinex history provider only supports trade information, does not support quotes.");
+                    Log.Error("BitfinexBrokerage.GetHistory(): Bitfinex only supports TradeBars");
+                }
+                yield break;
+            }
+
             var symbol = _symbolMapper.GetBrokerageSymbol(request.Symbol);
             var resultionTimeSpan = request.Resolution.ToTimeSpan();
             var resolutionString = ConvertResolution(request.Resolution);
@@ -505,11 +517,12 @@ namespace QuantConnect.Brokerages.Bitfinex
         /// </summary>
         public override void Dispose()
         {
-            _aggregator.Dispose();
-            _restRateLimiter.Dispose();
-            _connectionRateLimiter.Dispose();
-            _onSubscribeEvent.Dispose();
-            _onUnsubscribeEvent.Dispose();
+            _aggregator.DisposeSafely();
+            _restRateLimiter.DisposeSafely();
+            _connectionRateLimiter.DisposeSafely();
+            _onSubscribeEvent.DisposeSafely();
+            _onUnsubscribeEvent.DisposeSafely();
+            SubscriptionManager.DisposeSafely();
         }
 
         private bool CanSubscribe(Symbol symbol)
