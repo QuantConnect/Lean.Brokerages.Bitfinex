@@ -517,11 +517,12 @@ namespace QuantConnect.Brokerages.Bitfinex
         /// </summary>
         public override void Dispose()
         {
-            _aggregator.Dispose();
-            _restRateLimiter.Dispose();
-            _connectionRateLimiter.Dispose();
-            _onSubscribeEvent.Dispose();
-            _onUnsubscribeEvent.Dispose();
+            _aggregator.DisposeSafely();
+            _restRateLimiter.DisposeSafely();
+            _connectionRateLimiter.DisposeSafely();
+            _onSubscribeEvent.DisposeSafely();
+            _onUnsubscribeEvent.DisposeSafely();
+            SubscriptionManager.DisposeSafely();
         }
 
         private bool CanSubscribe(Symbol symbol)
