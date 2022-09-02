@@ -30,6 +30,8 @@ For more information about the Bitfinex brokerage, see the [QuantConnect-Bitfine
 
   You can deploy using a visual interface in the QuantConnect Cloud. For more information see the [QuantConnect-Bitfinex Integration Page](https://www.quantconnect.com/brokerages/bitfinex).
 
+ ![deploy-bitfinex](https://user-images.githubusercontent.com/38889814/188244293-ccbf30d3-da4d-49f9-bbb3-05b8ddffd626.gif)
+ 
   In the QuantConnect Cloud Platform you can harness the QuantConnect Live Data Feed. For most users this is substantially cheaper and easier than self-hosting.
   
 ### Deploying Bitfinex with LEAN CLI
