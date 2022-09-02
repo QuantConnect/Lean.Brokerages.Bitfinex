@@ -14,9 +14,9 @@ This repository hosts the Bitfinex Brokerage Plugin Integration with the QuantCo
 
 <p align="center">
 <picture >
-  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/">
-  <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/">
-  <img alt="introduction" width="40%">
+ <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/79997186/188237993-96db975d-5194-4d34-b652-d5b1a2473f36.png">
+ <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/79997186/188237998-34998b04-15e0-49ed-a191-b85cab49bbf2.png">
+ <img alt="bitfinex" width="30%">
 </picture>
 <p>
 
