@@ -22,6 +22,8 @@ This repository hosts the Bitfinex Brokerage Plugin Integration with the QuantCo
 
 [Bitfinex](https://www.bitfinex.com/) was founded by Giancarlo Devasini and Raphael Nicolle in 2012 with the goal to "give our users the ultimate cryptocurrency trading experience". Bitfinex provides access to trading Crypto for clients outside [prohibited jurisdictions](https://www.bitfinex.com/legal/exchange/terms) with no minimum deposit to set up an account. If you fund your account with fiat currency, they enforce a [10,000 minimum](https://support.bitfinex.com/hc/en-us/articles/360023357574-Bank-Wire-Deposit-) for USD, EUR, and GBP. However, if you fund your account with Crypto, they do not enforce a minimum deposit. Bitfinex also provides Crypto staking, a mobile app, and an unrealized profit leaderboard for the traders on the platform. Bitfinex has always been at the forefront of technological innovation in digital asset trading.
 
+For more information about the Bitfinex brokerage, see the [QuantConnect-Bitfinex Integration Page](https://www.quantconnect.com/docs/v2/our-platform/live-trading/brokerages/bitfinex).
+
 ## Using the Brokerage Plugin
   
 ### Deploying Bitfinex with VSCode User Interace
@@ -35,7 +37,7 @@ This repository hosts the Bitfinex Brokerage Plugin Integration with the QuantCo
 Follow these steps to start local live trading with the Bitfinex brokerage:
 
 1.  Open a terminal in your [CLI root directory](https://www.quantconnect.com/docs/v2/lean-cli/initialization/directory-structure#02-lean-init).
-2.  Run lean live "`<projectName>`" to start a live deployment wizard for the project in ./`<projectName>` and then enter the brokerage number.
+2.  Run `lean live "<projectName>`" to start a live deployment wizard for the project in ./`<projectName>` and then enter the brokerage number.
 
     ```
     $ lean live 'My Project'
@@ -67,7 +69,7 @@ Follow these steps to start local live trading with the Bitfinex brokerage:
     1. Organization 1
     2. Organization 2
     3. Organization 3
-       Enter an option: 1
+    Enter an option: 1
     ```
 
 4.  Enter your API key id and secret.
@@ -102,15 +104,14 @@ Follow these steps to start local live trading with the Bitfinex brokerage:
     13. IQFeed
     14. Polygon Data Feed
     15. Custom Data Only
-  
-        To enter multiple options, separate them with comma:
+    To enter multiple options, separate them with comma:
     ```
 
-If you select Polygon Data Feed, see [Polygon](https://www.quantconnect.com/docs/v2/lean-cli/live-trading/other-data-feeds/polygon) for set up instructions.
+    If you select Polygon Data Feed, see [Polygon](https://www.quantconnect.com/docs/v2/lean-cli/live-trading/other-data-feeds/polygon) for set up instructions.
 
-1. View the result in the `<projectName>`/live/`<timestamp>` directory. Results are stored in real-time in JSON format. You can save results to a different directory by providing the --output `<path>` option in step 2.
+6. View the result in the `<projectName>live<timestamp>` directory. Results are stored in real-time in JSON format. You can save results to a different directory by providing the `--output <path>` option in step 2.
 
-If you already have a live environment configured in your [Lean configuration file](https://www.quantconnect.com/docs/v2/lean-cli/initialization/configuration#03-Lean-Configuration), you can skip the interactive wizard by providing the --environment `<value>` option in step 2. The value of this option must be the name of an environment which has live-mode set to true.
+If you already have a live environment configured in your [Lean configuration file](https://www.quantconnect.com/docs/v2/lean-cli/initialization/configuration#03-Lean-Configuration), you can skip the interactive wizard by providing the `--environment <value>` option in step 2. The value of this option must be the name of an environment which has `live-mode` set to true.
 
 ## Account Types
 
@@ -132,7 +133,7 @@ Bitfinex supports trading crypto and the following order types:
 
 For local deployment, the algorithm needs to download the following dataset:
 
-[Bitfinex Crypto Price Data](https://www.quantconnect.com/datasets/bitfinex-crypto-price-data)  
+- [Bitfinex Crypto Price Data](https://www.quantconnect.com/datasets/bitfinex-crypto-price-data)  
 
 
 ## Brokerage Model
@@ -150,7 +151,7 @@ You can set the Brokerage Model with the following statements
 
 We model the order fees of Bitfinex, which are a 0.1% maker fee and a 0.2% taker fee. If you place a limit order that hits a hidden order or you add liquidity to the order book by placing a limit order that doesn't cross the spread, you pay maker fees. If you place a hidden order or you remove liquidity from the order book by placing an order that crosses the spread, you pay taker fees. Bitfinex adjusts your fees based on your 30-day trading volume and LEO balance, but we don't currently model these metrics to adjust fees. To check the latest fees at all the fee levels, see the [Fees Schedule](https://www.bitfinex.com/fees/) page on the Bitfinex website.
 
-To use the Bitfinex brokerage in a live algorithm, the following table shows the fee settings you need on your Account > Fees page on the Bitfinex website:
+To use the Bitfinex brokerage in a live algorithm, the following table shows the fee settings you need on your **Account > Fees** page on the Bitfinex website:
 
 
 |Fee Setting|Value|
