@@ -160,6 +160,7 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
             Security xchfchf = new Crypto(
                 SecurityExchangeHours.AlwaysOpen(tz),
                 new Cash("CHF", 0, 10),
+                new Cash("XCHF", 0, 1),
                 new SubscriptionDataConfig(typeof(TradeBar), Symbol.Create("XCHFCHF", SecurityType.Crypto, Market.Binance), Resolution.Minute, tz, tz, true, false, false),
                 new SymbolProperties("XCHFCHF", "CHF", 1, 0.01m, 0.00000001m, string.Empty),
                 ErrorCurrencyConverter.Instance,
