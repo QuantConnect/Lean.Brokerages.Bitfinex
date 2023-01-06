@@ -379,7 +379,7 @@ namespace QuantConnect.Brokerages.Bitfinex
                     .Value;
                 if (order == null)
                 {
-                    order = _algorithm.Transactions.GetOrdersByBrokerageId(brokerId).SingleOrDefault();
+                    order = _algorithm.Transactions.GetOrdersByBrokerageId(brokerId)?.SingleOrDefault();
                     if (order == null)
                     {
                         Log.Error($"OnOrderUpdate(): order not found: BrokerId: {brokerId}");
@@ -405,7 +405,7 @@ namespace QuantConnect.Brokerages.Bitfinex
                     .Value;
                 if (order == null)
                 {
-                    order = _algorithm.Transactions.GetOrdersByBrokerageId(brokerId).SingleOrDefault();
+                    order = _algorithm.Transactions.GetOrdersByBrokerageId(brokerId)?.SingleOrDefault();
                     if (order == null)
                     {
                         Log.Error($"OnOrderClose(): order not found: BrokerId: {brokerId}");
@@ -443,7 +443,7 @@ namespace QuantConnect.Brokerages.Bitfinex
 
                 if (order == null)
                 {
-                    order = _algorithm.Transactions.GetOrdersByBrokerageId(brokerId).SingleOrDefault();
+                    order = _algorithm.Transactions.GetOrdersByBrokerageId(brokerId)?.SingleOrDefault();
                     if (order == null)
                     {
                         Log.Error($"BitfinexBrokerage.EmitFillOrder(): order not found: BrokerId: {brokerId}");
