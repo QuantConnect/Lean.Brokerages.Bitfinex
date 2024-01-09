@@ -44,20 +44,17 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
 
             var transactions = new SecurityTransactionManager(null, securities);
             transactions.SetOrderProcessor(new FakeOrderProcessor());
+            var algorithmSettings = new AlgorithmSettings();
 
             var algorithm = new Mock<IAlgorithm>();
             algorithm.Setup(a => a.Transactions).Returns(transactions);
             algorithm.Setup(a => a.BrokerageModel).Returns(new BitfinexBrokerageModel());
-            algorithm.Setup(a => a.Portfolio).Returns(new SecurityPortfolioManager(securities, transactions));
-
-            var priceProvider = new Mock<IPriceProvider>();
-            priceProvider.Setup(a => a.GetLastPrice(It.IsAny<Symbol>())).Returns(1.234m);
+            algorithm.Setup(a => a.Portfolio).Returns(new SecurityPortfolioManager(securities, transactions, algorithmSettings));
 
             return new BitfinexBrokerage(
                     Config.Get("bitfinex-api-key"),
                     Config.Get("bitfinex-api-secret"),
                     algorithm.Object,
-                    priceProvider.Object,
                     new AggregationManager(),
                     null
                 );

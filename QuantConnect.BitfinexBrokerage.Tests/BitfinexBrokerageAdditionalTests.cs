@@ -37,8 +37,6 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
         [SetUp]
         public void Setup()
         {
-            var priceProvider = new Mock<IPriceProvider>();
-            priceProvider.Setup(x => x.GetLastPrice(It.IsAny<Symbol>())).Returns(1.234m);
             var aggregator = new Mock<IDataAggregator>();
 
             _brokerage = new BitfinexBrokerage(
@@ -47,7 +45,6 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
                 "apikey",
                 "apisecret",
                 _algorithm,
-                priceProvider.Object,
                 aggregator.Object,
                 null);
 
