@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using QuantConnect.Configuration;
 using QuantConnect.Data;
 using QuantConnect.Interfaces;
@@ -77,13 +76,10 @@ namespace QuantConnect.Brokerages.Bitfinex
                     throw new Exception($"BitfinexBrokerageFactory.CreateBrokerage: Missing {item} in config.json");
             }
 
-            var priceProvider = new ApiPriceProvider(job.UserId, job.UserToken);
-
             var brokerage = new BitfinexBrokerage(
                 job.BrokerageData["bitfinex-api-key"],
                 job.BrokerageData["bitfinex-api-secret"],
                 algorithm,
-                priceProvider,
                 Composer.Instance.GetExportedValueByTypeName<IDataAggregator>(Config.Get("data-aggregator", "QuantConnect.Lean.Engine.DataFeeds.AggregationManager"), forceTypeNameOnExisting: false),
                 job);
             Composer.Instance.AddPart<IDataQueueHandler>(brokerage);
