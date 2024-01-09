@@ -39,7 +39,7 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
             return new[]
             {
                 // valid
-                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, false, false, TickType.Trade),
+                new TestCaseData(StaticSymbol, Resolution.Minute, TimeSpan.FromMinutes(2), false, false, TickType.Trade),
                 new TestCaseData(StaticSymbol, Resolution.Hour, Time.OneDay, false, false, TickType.Trade),
                 new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(15), false, false, TickType.Trade),
 
