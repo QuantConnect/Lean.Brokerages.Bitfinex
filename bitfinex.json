@@ -1,0 +1,17 @@
+{
+	"description": "Bitfinex is a crypto-currency exchange founded in 2012 based in Hong Kong. ",
+	
+	"platforms-features": [
+		{
+			"Platforms": ["Cloud Platform", "Local Platform", "LEAN CLI"],
+			"Download Data": [1,1,1],
+			"Backtesting": [1,1,1],
+			"Optimization": [1,1,1],
+			"Live Trading":	[1,1,1]
+		}
+	],
+	"order-types": ["Market", "Limit", "Limit-If-Touched", "Stop Market",  "Stop Limit",  "Market On Open", "Market On Close" ],
+	"assets": [ "Crypto Spot" ], 
+	"brokerage-url": "https://www.bitfinex.com/",
+	"documentation": "/docs/v2/cloud-platform/live-trading/brokerages/bitfinex"
+}
