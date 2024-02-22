@@ -45,7 +45,9 @@ namespace QuantConnect.Brokerages.Bitfinex
     [BrokerageFactory(typeof(BitfinexBrokerageFactory))]
     public partial class BitfinexBrokerage : BaseWebsocketsBrokerage, IDataQueueHandler
     {
-        private bool _loggedSupportsOnlyTradeBars;
+        private bool _onlyTradeBarsSupportedHistoryLogged;
+        private bool _unsupportedAssetHistoryLogged;
+        private bool _unsupportedResolutionHistoryLogged;
         private readonly SymbolPropertiesDatabaseSymbolMapper _symbolMapper = new SymbolPropertiesDatabaseSymbolMapper(Market.Bitfinex);
 
         #region IBrokerage
@@ -344,23 +346,32 @@ namespace QuantConnect.Brokerages.Bitfinex
         {
             if (!CanSubscribe(request.Symbol))
             {
-                OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "NotSupported",
-                    "BitfinexBrokerage.GetHistory: asset not supported: " + request.Symbol.Value));
+                if (!_unsupportedAssetHistoryLogged)
+                {
+                    _unsupportedAssetHistoryLogged = true;
+                    OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "NotSupported",
+                        $"BitfinexBrokerage.GetHistory: asset not supported: {request.Symbol.Value}. " +
+                        $"Only Crypto assets with market {Market.Bitfinex} are supported."));
+                }
                 return null;
             }
 
             if (request.Resolution == Resolution.Tick || request.Resolution == Resolution.Second)
             {
-                OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "InvalidResolution",
-                    $"{request.Resolution} resolution not supported, no history returned"));
+                if (!_unsupportedResolutionHistoryLogged)
+                {
+                    _unsupportedResolutionHistoryLogged = true;
+                    OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "InvalidResolution",
+                        $"{request.Resolution} resolution not supported, no history returned. Only minute resolution and higher are supported"));
+                }
                 return null;
             }
 
             if (request.TickType != TickType.Trade)
             {
-                if (!_loggedSupportsOnlyTradeBars)
+                if (!_onlyTradeBarsSupportedHistoryLogged)
                 {
-                    _loggedSupportsOnlyTradeBars = true;
+                    _onlyTradeBarsSupportedHistoryLogged = true;
                     _algorithm?.Debug("Warning: Bitfinex history provider only supports trade information, does not support quotes.");
                     Log.Error("BitfinexBrokerage.GetHistory(): Bitfinex only supports TradeBars");
                 }
