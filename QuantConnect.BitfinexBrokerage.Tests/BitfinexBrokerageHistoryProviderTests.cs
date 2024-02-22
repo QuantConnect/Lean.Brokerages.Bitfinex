@@ -18,12 +18,11 @@ using System.Linq;
 using NodaTime;
 using NUnit.Framework;
 using QuantConnect.Data;
-using QuantConnect.Lean.Engine.HistoricalData;
 using QuantConnect.Logging;
 using QuantConnect.Securities;
 using QuantConnect.Brokerages.Bitfinex;
-using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Util;
+using QuantConnect.Data.Market;
 
 namespace QuantConnect.Tests.Brokerages.Bitfinex
 {
@@ -55,7 +54,6 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
                 // invalid period, no error, empty result
                 new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(-15), true, false, TickType.Trade),
 
-                // invalid symbol, throws "System.ArgumentException : Unknown symbol: XYZ"
                 new TestCaseData(Symbol.Create("XYZ", SecurityType.Crypto, Market.Bitfinex),
                     Resolution.Daily, TimeSpan.FromDays(15), false, true, TickType.Trade),
 
@@ -64,37 +62,26 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
             };
         }
 
-
         [Test]
         [TestCaseSource(nameof(History))]
         public void GetsHistory(Symbol symbol, Resolution resolution, TimeSpan period, bool shouldBeEmpty, bool notSupported, TickType tickType)
         {
             var brokerage = (BitfinexBrokerage)Brokerage;
-
-            var historyProvider = new BrokerageHistoryProvider();
-            historyProvider.SetBrokerage(brokerage);
-            historyProvider.Initialize(new HistoryProviderInitializeParameters(null, null, null, null, null, null, null, false, new DataPermissionManager(), null));
-
             var now = DateTime.UtcNow;
+            var request = new HistoryRequest(now.Add(-period),
+                now,
+                LeanData.GetDataType(resolution, tickType),
+                symbol,
+                resolution,
+                SecurityExchangeHours.AlwaysOpen(TimeZones.Utc),
+                DateTimeZone.Utc,
+                Resolution.Minute,
+                false,
+                false,
+                DataNormalizationMode.Adjusted,
+                tickType);
 
-            var requests = new[]
-            {
-                    new HistoryRequest(now.Add(-period),
-                                       now,
-                                       LeanData.GetDataType(resolution, tickType),
-                                       symbol,
-                                       resolution,
-                                       SecurityExchangeHours.AlwaysOpen(TimeZones.Utc),
-                                       DateTimeZone.Utc,
-                                       Resolution.Minute,
-                                       false,
-                                       false,
-                                       DataNormalizationMode.Adjusted,
-                                       tickType)
-                };
-
-            // 'GetBrokerageSymbol' method called inside 'GetHistory' may throw an ArgumentException for invalid symbol supplied
-            var history = historyProvider.GetHistory(requests, TimeZones.Utc);
+            var history = brokerage.GetHistory(request);
 
             if (notSupported)
             {
@@ -108,13 +95,12 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
             {
                 var historyList = history.ToList();
 
-                foreach (var slice in historyList)
+                foreach (TradeBar bar in historyList)
                 {
-                    var bar = slice.Bars[symbol];
                     Log.Trace("{0}: {1} - O={2}, H={3}, L={4}, C={5}", bar.Time, bar.Symbol, bar.Open, bar.High, bar.Low, bar.Close);
                 }
 
-                Log.Trace("Data points retrieved: " + historyProvider.DataPointCount);
+                Log.Trace("Data points retrieved: " + historyList.Count);
 
                 Assert.IsTrue(historyList.Count > 0);
             }
