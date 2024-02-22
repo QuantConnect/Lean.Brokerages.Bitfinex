@@ -44,43 +44,41 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
                 new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(15), false, false, TickType.Trade),
 
                 // invalid data types, no error, empty result
-                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, true, false, TickType.Quote),
-                new TestCaseData(StaticSymbol, Resolution.Tick, Time.OneMinute, true, false, TickType.Quote),
-                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, true, false, TickType.OpenInterest),
+                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, false, true, TickType.Quote),
+                new TestCaseData(StaticSymbol, Resolution.Tick, Time.OneMinute, false, true, TickType.Quote),
+                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, false, true, TickType.OpenInterest),
 
                 // invalid resolution, no error, empty result
-                new TestCaseData(StaticSymbol, Resolution.Tick, TimeSpan.FromSeconds(15), true, false, TickType.Trade),
-                new TestCaseData(StaticSymbol, Resolution.Second, Time.OneMinute, true, false, TickType.Trade),
+                new TestCaseData(StaticSymbol, Resolution.Tick, TimeSpan.FromSeconds(15), false, true, TickType.Trade),
+                new TestCaseData(StaticSymbol, Resolution.Second, Time.OneMinute, false, true, TickType.Trade),
 
                 // invalid period, no error, empty result
                 new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(-15), true, false, TickType.Trade),
 
                 // invalid symbol, throws "System.ArgumentException : Unknown symbol: XYZ"
                 new TestCaseData(Symbol.Create("XYZ", SecurityType.Crypto, Market.Bitfinex),
-                    Resolution.Daily, TimeSpan.FromDays(15), true, true, TickType.Trade),
+                    Resolution.Daily, TimeSpan.FromDays(15), false, true, TickType.Trade),
 
                 // invalid security type, no error, empty result
-                new TestCaseData(Symbols.EURUSD, Resolution.Daily, TimeSpan.FromDays(15), true, false, TickType.Trade)
+                new TestCaseData(Symbols.EURUSD, Resolution.Daily, TimeSpan.FromDays(15), false, true, TickType.Trade)
             };
         }
-            
+
 
         [Test]
         [TestCaseSource(nameof(History))]
-        public void GetsHistory(Symbol symbol, Resolution resolution, TimeSpan period, bool shouldBeEmpty, bool throwsException, TickType tickType)
+        public void GetsHistory(Symbol symbol, Resolution resolution, TimeSpan period, bool shouldBeEmpty, bool notSupported, TickType tickType)
         {
-            TestDelegate test = () =>
+            var brokerage = (BitfinexBrokerage)Brokerage;
+
+            var historyProvider = new BrokerageHistoryProvider();
+            historyProvider.SetBrokerage(brokerage);
+            historyProvider.Initialize(new HistoryProviderInitializeParameters(null, null, null, null, null, null, null, false, new DataPermissionManager(), null));
+
+            var now = DateTime.UtcNow;
+
+            var requests = new[]
             {
-                var brokerage = (BitfinexBrokerage)Brokerage;
-
-                var historyProvider = new BrokerageHistoryProvider();
-                historyProvider.SetBrokerage(brokerage);
-                historyProvider.Initialize(new HistoryProviderInitializeParameters(null, null, null, null, null, null, null, false, new DataPermissionManager(), null));
-
-                var now = DateTime.UtcNow;
-
-                var requests = new[]
-                {
                     new HistoryRequest(now.Add(-period),
                                        now,
                                        LeanData.GetDataType(resolution, tickType),
@@ -95,10 +93,22 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
                                        tickType)
                 };
 
-                // 'GetBrokerageSymbol' method called inside 'GetHistory' may throw an ArgumentException for invalid symbol supplied
-                var history = historyProvider.GetHistory(requests, TimeZones.Utc).ToList();
+            // 'GetBrokerageSymbol' method called inside 'GetHistory' may throw an ArgumentException for invalid symbol supplied
+            var history = historyProvider.GetHistory(requests, TimeZones.Utc);
 
-                foreach (var slice in history)
+            if (notSupported)
+            {
+                Assert.IsNull(history);
+            }
+            else if (shouldBeEmpty)
+            {
+                Assert.IsEmpty(history);
+            }
+            else
+            {
+                var historyList = history.ToList();
+
+                foreach (var slice in historyList)
                 {
                     var bar = slice.Bars[symbol];
                     Log.Trace("{0}: {1} - O={2}, H={3}, L={4}, C={5}", bar.Time, bar.Symbol, bar.Open, bar.High, bar.Low, bar.Close);
@@ -106,24 +116,7 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
 
                 Log.Trace("Data points retrieved: " + historyProvider.DataPointCount);
 
-                if (shouldBeEmpty)
-                {
-                    Assert.IsTrue(history.Count == 0);
-                }
-                else
-                {
-                    Assert.IsTrue(history.Count > 0);
-                }
-            };
-
-            // assert for ArgumentException
-            if (throwsException)
-            {
-                Assert.Throws<ArgumentException>(test);
-            }
-            else
-            {
-                Assert.DoesNotThrow(test);
+                Assert.IsTrue(historyList.Count > 0);
             }
         }
     }

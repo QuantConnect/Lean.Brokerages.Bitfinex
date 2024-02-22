@@ -342,25 +342,18 @@ namespace QuantConnect.Brokerages.Bitfinex
         /// <returns>An enumerable of bars covering the span specified in the request</returns>
         public override IEnumerable<BaseData> GetHistory(Data.HistoryRequest request)
         {
-            if (request.Symbol.SecurityType != SecurityType.Crypto)
+            if (!CanSubscribe(request.Symbol))
             {
-                OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "InvalidSecurityType",
-                    $"{request.Symbol.SecurityType} security type not supported, no history returned"));
-                yield break;
+                OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "NotSupported",
+                    "BitfinexBrokerage.GetHistory: asset not supported: " + request.Symbol.Value));
+                return null;
             }
 
             if (request.Resolution == Resolution.Tick || request.Resolution == Resolution.Second)
             {
                 OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "InvalidResolution",
                     $"{request.Resolution} resolution not supported, no history returned"));
-                yield break;
-            }
-
-            if (request.StartTimeUtc >= request.EndTimeUtc)
-            {
-                OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "InvalidDateRange",
-                    "The history request start date must precede the end date, no history returned"));
-                yield break;
+                return null;
             }
 
             if (request.TickType != TickType.Trade)
@@ -371,6 +364,21 @@ namespace QuantConnect.Brokerages.Bitfinex
                     _algorithm?.Debug("Warning: Bitfinex history provider only supports trade information, does not support quotes.");
                     Log.Error("BitfinexBrokerage.GetHistory(): Bitfinex only supports TradeBars");
                 }
+                return null;
+            }
+
+            return GetHistoryImpl(request);
+        }
+
+        /// <summary>
+        /// Gets history without doing any validation checks on the requested security
+        /// </summary>
+        private IEnumerable<BaseData> GetHistoryImpl(Data.HistoryRequest request)
+        {
+            if (request.StartTimeUtc >= request.EndTimeUtc)
+            {
+                OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "InvalidDateRange",
+                    "The history request start date must precede the end date, no history returned"));
                 yield break;
             }
 
