@@ -86,11 +86,6 @@ namespace QuantConnect.ToolBox.BitfinexDownloader
 
             var data = _brokerage.GetHistory(historyRequest);
 
-            if (data == null)
-            {
-                return Enumerable.Empty<BaseData>();
-            }
-
             return data;
 
         }
