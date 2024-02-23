@@ -48,6 +48,7 @@ namespace QuantConnect.Brokerages.Bitfinex
         private bool _onlyTradeBarsSupportedHistoryLogged;
         private bool _unsupportedAssetHistoryLogged;
         private bool _unsupportedResolutionHistoryLogged;
+        private bool _invalidTimeRangeHistoryLogged;
         private readonly SymbolPropertiesDatabaseSymbolMapper _symbolMapper = new SymbolPropertiesDatabaseSymbolMapper(Market.Bitfinex);
 
         #region IBrokerage
@@ -378,6 +379,17 @@ namespace QuantConnect.Brokerages.Bitfinex
                 return null;
             }
 
+            if (request.StartTimeUtc >= request.EndTimeUtc)
+            {
+                if (!_invalidTimeRangeHistoryLogged)
+                {
+                    _invalidTimeRangeHistoryLogged = true;
+                    OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "InvalidDateRange",
+                        "The history request start date must precede the end date, no history returned"));
+                }
+                return null;
+            }
+
             return GetHistoryImpl(request);
         }
 
@@ -386,13 +398,6 @@ namespace QuantConnect.Brokerages.Bitfinex
         /// </summary>
         private IEnumerable<BaseData> GetHistoryImpl(Data.HistoryRequest request)
         {
-            if (request.StartTimeUtc >= request.EndTimeUtc)
-            {
-                OnMessage(new BrokerageMessageEvent(BrokerageMessageType.Warning, "InvalidDateRange",
-                    "The history request start date must precede the end date, no history returned"));
-                yield break;
-            }
-
             var symbol = _symbolMapper.GetBrokerageSymbol(request.Symbol);
             var resultionTimeSpan = request.Resolution.ToTimeSpan();
             var resolutionString = ConvertResolution(request.Resolution);

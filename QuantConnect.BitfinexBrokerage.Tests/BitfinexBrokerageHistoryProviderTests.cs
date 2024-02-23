@@ -29,42 +29,39 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
     [TestFixture]
     public partial class BitfinexBrokerageTests
     {
-        // the last two bools in params order are:
-        // 1) whether or not 'GetHistory' is expected to return an empty result
-        // 2) whether or not an ArgumentException is expected to be thrown during 'GetHistory' execution
         private static TestCaseData[] History()
         {
             TestGlobals.Initialize();
             return new[]
             {
                 // valid
-                new TestCaseData(StaticSymbol, Resolution.Minute, TimeSpan.FromMinutes(2), false, false, TickType.Trade),
-                new TestCaseData(StaticSymbol, Resolution.Hour, Time.OneDay, false, false, TickType.Trade),
-                new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(15), false, false, TickType.Trade),
+                new TestCaseData(StaticSymbol, Resolution.Minute, TimeSpan.FromMinutes(30), false, TickType.Trade),
+                new TestCaseData(StaticSymbol, Resolution.Hour, Time.OneDay, false, TickType.Trade),
+                new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(15), false, TickType.Trade),
 
-                // invalid data types, no error, empty result
-                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, false, true, TickType.Quote),
-                new TestCaseData(StaticSymbol, Resolution.Tick, Time.OneMinute, false, true, TickType.Quote),
-                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, false, true, TickType.OpenInterest),
+                // invalid data types, no error, null result
+                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, true, TickType.Quote),
+                new TestCaseData(StaticSymbol, Resolution.Tick, Time.OneMinute, true, TickType.Quote),
+                new TestCaseData(StaticSymbol, Resolution.Minute, Time.OneMinute, true, TickType.OpenInterest),
 
-                // invalid resolution, no error, empty result
-                new TestCaseData(StaticSymbol, Resolution.Tick, TimeSpan.FromSeconds(15), false, true, TickType.Trade),
-                new TestCaseData(StaticSymbol, Resolution.Second, Time.OneMinute, false, true, TickType.Trade),
+                // invalid resolution, no error, null result
+                new TestCaseData(StaticSymbol, Resolution.Tick, TimeSpan.FromSeconds(15), true, TickType.Trade),
+                new TestCaseData(StaticSymbol, Resolution.Second, Time.OneMinute, true, TickType.Trade),
 
-                // invalid period, no error, empty result
-                new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(-15), true, false, TickType.Trade),
+                // invalid period, no error, null result
+                new TestCaseData(StaticSymbol, Resolution.Daily, TimeSpan.FromDays(-15), true, TickType.Trade),
 
                 new TestCaseData(Symbol.Create("XYZ", SecurityType.Crypto, Market.Bitfinex),
-                    Resolution.Daily, TimeSpan.FromDays(15), false, true, TickType.Trade),
+                    Resolution.Daily, TimeSpan.FromDays(15), true, TickType.Trade),
 
-                // invalid security type, no error, empty result
-                new TestCaseData(Symbols.EURUSD, Resolution.Daily, TimeSpan.FromDays(15), false, true, TickType.Trade)
+                // invalid security type, no error, null result
+                new TestCaseData(Symbols.EURUSD, Resolution.Daily, TimeSpan.FromDays(15), true, TickType.Trade)
             };
         }
 
         [Test]
         [TestCaseSource(nameof(History))]
-        public void GetsHistory(Symbol symbol, Resolution resolution, TimeSpan period, bool shouldBeEmpty, bool notSupported, TickType tickType)
+        public void GetsHistory(Symbol symbol, Resolution resolution, TimeSpan period, bool notSupported, TickType tickType)
         {
             var brokerage = (BitfinexBrokerage)Brokerage;
             var now = DateTime.UtcNow;
@@ -81,29 +78,22 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
                 DataNormalizationMode.Adjusted,
                 tickType);
 
-            var history = brokerage.GetHistory(request);
+            var history = brokerage.GetHistory(request)?.ToList();
 
             if (notSupported)
             {
                 Assert.IsNull(history);
+                return;
             }
-            else if (shouldBeEmpty)
+
+            foreach (TradeBar bar in history)
             {
-                Assert.IsEmpty(history);
+                Log.Trace("{0}: {1} - O={2}, H={3}, L={4}, C={5}", bar.Time, bar.Symbol, bar.Open, bar.High, bar.Low, bar.Close);
             }
-            else
-            {
-                var historyList = history.ToList();
 
-                foreach (TradeBar bar in historyList)
-                {
-                    Log.Trace("{0}: {1} - O={2}, H={3}, L={4}, C={5}", bar.Time, bar.Symbol, bar.Open, bar.High, bar.Low, bar.Close);
-                }
+            Log.Trace("Data points retrieved: " + history.Count);
 
-                Log.Trace("Data points retrieved: " + historyList.Count);
-
-                Assert.IsTrue(historyList.Count > 0);
-            }
+            Assert.IsTrue(history.Count > 0);
         }
     }
 }
