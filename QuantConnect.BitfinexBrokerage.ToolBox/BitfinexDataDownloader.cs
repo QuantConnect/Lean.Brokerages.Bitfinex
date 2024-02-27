@@ -54,21 +54,6 @@ namespace QuantConnect.ToolBox.BitfinexDownloader
             var resolution = dataDownloaderGetParameters.Resolution;
             var startUtc = dataDownloaderGetParameters.StartUtc;
             var endUtc = dataDownloaderGetParameters.EndUtc;
-            var tickType = dataDownloaderGetParameters.TickType;
-
-            if (tickType != TickType.Trade)
-            {
-                return Enumerable.Empty<BaseData>();
-            }
-
-            if (resolution == Resolution.Tick || resolution == Resolution.Second)
-                throw new ArgumentException($"Resolution not available: {resolution}");
-
-            if (!_symbolMapper.IsKnownLeanSymbol(symbol))
-                throw new ArgumentException($"The ticker {symbol.Value} is not available.");
-
-            if (endUtc < startUtc)
-                throw new ArgumentException("The end date must be greater or equal than the start date.");
 
             var historyRequest = new HistoryRequest(
                 startUtc,
@@ -87,7 +72,6 @@ namespace QuantConnect.ToolBox.BitfinexDownloader
             var data = _brokerage.GetHistory(historyRequest);
 
             return data;
-
         }
 
         /// <summary>
@@ -110,7 +94,7 @@ namespace QuantConnect.ToolBox.BitfinexDownloader
                 throw new Exception($"Unknown ticker symbol: {ticker}");
             }
         }
-        
+
         #region Console Helper
 
         /// <summary>

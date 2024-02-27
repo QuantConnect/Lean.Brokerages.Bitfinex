@@ -55,6 +55,10 @@ namespace QuantConnect.ToolBox.BitfinexDownloader
                         foreach (var castResolution in resolutions)
                         {
                             var data = downloader.Get(new DataDownloaderGetParameters(symbol, castResolution, fromDate, toDate));
+                            if (data == null)
+                            {
+                                continue;
+                            }
 
                             // Save the data (single resolution)
                             var writer = new LeanDataWriter(castResolution, symbol, dataDirectory);
