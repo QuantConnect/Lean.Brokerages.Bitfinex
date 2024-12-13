@@ -39,7 +39,7 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
         {
             var securities = new SecurityManager(new TimeKeeper(DateTime.UtcNow, TimeZones.NewYork))
             {
-                {Symbol, CreateSecurity(Symbol)}
+                {Symbol, SecurityProvider.GetSecurity(Symbol)}
             };
 
             var transactions = new SecurityTransactionManager(null, securities);
