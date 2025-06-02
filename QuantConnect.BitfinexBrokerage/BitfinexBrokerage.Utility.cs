@@ -186,6 +186,10 @@ namespace QuantConnect.Brokerages.Bitfinex
                     outputOrderType = "STOP";
                     break;
 
+                case OrderType.StopLimit:
+                    outputOrderType = "STOP LIMIT";
+                    break;
+
                 default:
                     throw new NotSupportedException($"BitfinexBrokerage.ConvertOrderType: Unsupported order type: {orderType}");
             }
@@ -213,6 +217,9 @@ namespace QuantConnect.Brokerages.Bitfinex
 
                 case OrderType.StopMarket:
                     return ((StopMarketOrder)order).StopPrice;
+
+                case OrderType.StopLimit:
+                    return ((StopLimitOrder)order).LimitPrice;
             }
 
             throw new NotSupportedException($"BitfinexBrokerage.ConvertOrderType: Unsupported order type: {order.Type}");
