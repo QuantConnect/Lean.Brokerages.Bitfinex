@@ -38,8 +38,7 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
         /// <returns></returns>
         protected override IBrokerage CreateBrokerage(IOrderProvider orderProvider, ISecurityProvider securityProvider)
         {
-            var security = SecurityProvider.GetSecurity(Symbol);
-            security.Holdings = new SecurityHolding(security, new CashBook());
+            var security = securityProvider.GetSecurity(Symbol);
             var securities = new SecurityManager(new TimeKeeper(DateTime.UtcNow, TimeZones.NewYork))
             {
                 {Symbol, security}
