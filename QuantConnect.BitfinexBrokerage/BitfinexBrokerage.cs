@@ -73,6 +73,11 @@ namespace QuantConnect.Brokerages.Bitfinex
                 { "price", GetOrderPrice(order).ToStringInvariant() }
             };
 
+            if (order is StopLimitOrder stopLimitOrder)
+            {
+                parameters.Add("price_aux_limit", stopLimitOrder.StopPrice.ToStringInvariant());
+            }
+
             var orderProperties = order.Properties as BitfinexOrderProperties;
             if (orderProperties != null)
             {
@@ -200,18 +205,23 @@ namespace QuantConnect.Brokerages.Bitfinex
                 var price = item.Price;
                 var symbol = _symbolMapper.GetLeanSymbol(item.Symbol, SecurityType.Crypto, Market.Bitfinex);
                 var time = Time.UnixMillisecondTimeStampToDateTime(item.MtsCreate);
+                var orderTypeStr = item.Type.Replace("EXCHANGE", "").Trim();
 
-                if (item.Type.Replace("EXCHANGE", "").Trim() == "MARKET")
+                if (orderTypeStr == "MARKET")
                 {
                     order = new MarketOrder(symbol, quantity, time, price);
                 }
-                else if (item.Type.Replace("EXCHANGE", "").Trim() == "LIMIT")
+                else if (orderTypeStr == "LIMIT")
                 {
                     order = new LimitOrder(symbol, quantity, price, time);
                 }
-                else if (item.Type.Replace("EXCHANGE", "").Trim() == "STOP")
+                else if (orderTypeStr == "STOP")
                 {
                     order = new StopMarketOrder(symbol, quantity, price, time);
+                }
+                else if (orderTypeStr == "STOP LIMIT")
+                {
+                    order = new StopLimitOrder(symbol, quantity, price, item.PriceAuxLimit, time);
                 }
                 else
                 {

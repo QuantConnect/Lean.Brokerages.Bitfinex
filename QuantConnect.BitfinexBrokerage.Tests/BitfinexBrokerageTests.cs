@@ -23,6 +23,7 @@ using Moq;
 using QuantConnect.Brokerages;
 using QuantConnect.Tests.Common.Securities;
 using QuantConnect.Lean.Engine.DataFeeds;
+using QuantConnect.Orders;
 
 namespace QuantConnect.Tests.Brokerages.Bitfinex
 {
@@ -37,9 +38,10 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
         /// <returns></returns>
         protected override IBrokerage CreateBrokerage(IOrderProvider orderProvider, ISecurityProvider securityProvider)
         {
+            var security = securityProvider.GetSecurity(Symbol);
             var securities = new SecurityManager(new TimeKeeper(DateTime.UtcNow, TimeZones.NewYork))
             {
-                {Symbol, SecurityProvider.GetSecurity(Symbol)}
+                {Symbol, security}
             };
 
             var transactions = new SecurityTransactionManager(null, securities);
@@ -48,8 +50,9 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
 
             var algorithm = new Mock<IAlgorithm>();
             algorithm.Setup(a => a.Transactions).Returns(transactions);
-            algorithm.Setup(a => a.BrokerageModel).Returns(new BitfinexBrokerageModel());
+            algorithm.Setup(a => a.BrokerageModel).Returns(new BitfinexBrokerageModel(AccountType.Cash));
             algorithm.Setup(a => a.Portfolio).Returns(new SecurityPortfolioManager(securities, transactions, algorithmSettings));
+            algorithm.Setup(a => a.Securities).Returns(securities);
 
             return new BitfinexBrokerage(
                     Config.Get("bitfinex-api-key"),
@@ -64,12 +67,20 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
         /// Gets the symbol to be traded, must be shortable
         /// </summary>
         protected override Symbol Symbol => StaticSymbol;
-        private static Symbol StaticSymbol => Symbol.Create("ETHUSD", SecurityType.Crypto, Market.Bitfinex);
+        private static Symbol StaticSymbol => Symbol.Create("TESTBTCTESTUSD", SecurityType.Crypto, Market.Bitfinex);
 
         /// <summary>
         /// Gets the security type associated with the <see cref="BrokerageTests.Symbol" />
         /// </summary>
         protected override SecurityType SecurityType => SecurityType.Crypto;
+
+        private static TestCaseData[] OrderParameters =>
+        [
+            new TestCaseData(new MarketOrderTestParameters(StaticSymbol)),
+            new TestCaseData(new LimitOrderTestParameters(StaticSymbol, 1000m, 100m)),
+            new TestCaseData(new StopMarketOrderTestParameters(StaticSymbol, 1000m, 100m)),
+            new TestCaseData(new StopLimitOrderTestParameters(StaticSymbol, 1000m, 100m)),
+        ];
 
         /// <summary>
         /// Gets the current market price of the specified security
@@ -95,43 +106,61 @@ namespace QuantConnect.Tests.Brokerages.Bitfinex
         /// </summary>
         protected override decimal GetDefaultQuantity() => 0.04m;
 
-        [Explicit("Ignore a test")]
+        [TestCaseSource(nameof(OrderParameters))]
         public override void CancelOrders(OrderTestParameters parameters)
         {
             base.CancelOrders(parameters);
         }
 
-        [Explicit("Ignore a test")]
+        [TestCaseSource(nameof(OrderParameters))]
         public override void LongFromZero(OrderTestParameters parameters)
         {
             base.LongFromZero(parameters);
+
+            if (parameters is not MarketOrderTestParameters)
+            {
+                // We expect the orders to be open
+                var openOrders = Brokerage.GetOpenOrders();
+                Assert.AreEqual(1, openOrders.Count);
+
+                var expectedOrderType = parameters switch
+                {
+                    LimitOrderTestParameters _ => typeof(LimitOrder),
+                    StopMarketOrderTestParameters _ => typeof(StopMarketOrder),
+                    StopLimitOrderTestParameters _ => typeof(StopLimitOrder),
+                    _ => throw new ArgumentException("Unsupported order type for this test", nameof(parameters))
+                };
+
+                // Check that the order type matches the expected type
+                Assert.IsInstanceOf(expectedOrderType, openOrders[0]);
+            }
         }
 
-        [Explicit("Ignore a test")]
+        [TestCaseSource(nameof(OrderParameters))]
         public override void CloseFromLong(OrderTestParameters parameters)
         {
             base.CloseFromLong(parameters);
         }
 
-        [Explicit("Ignore a test")]
+        [TestCaseSource(nameof(OrderParameters))]
         public override void ShortFromZero(OrderTestParameters parameters)
         {
             base.ShortFromZero(parameters);
         }
 
-        [Explicit("Ignore a test")]
+        [TestCaseSource(nameof(OrderParameters))]
         public override void CloseFromShort(OrderTestParameters parameters)
         {
             base.CloseFromShort(parameters);
         }
 
-        [Explicit("Ignore a test")]
+        [TestCaseSource(nameof(OrderParameters))]
         public override void ShortFromLong(OrderTestParameters parameters)
         {
             base.ShortFromLong(parameters);
         }
 
-        [Explicit("Ignore a test")]
+        [TestCaseSource(nameof(OrderParameters))]
         public override void LongFromShort(OrderTestParameters parameters)
         {
             base.LongFromShort(parameters);
