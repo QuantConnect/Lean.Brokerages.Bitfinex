@@ -1,4 +1,7 @@
 {
+    "name" : "Bitfinex",
+    "logo-url" : "https://cdn.quantconnect.com/web/i/splash/bitfinex_black_text.rev0.png",
+    "min-deposit" : "None",
     "description": "Bitfinex is a crypto-currency exchange founded in 2012 based in Hong Kong. ",
     "platforms-features": [
         {
