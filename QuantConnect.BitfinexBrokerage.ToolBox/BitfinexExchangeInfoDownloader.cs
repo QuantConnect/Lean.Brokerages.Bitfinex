@@ -141,7 +141,7 @@ namespace QuantConnect.ToolBox.BitfinexDownloader
                 var description = $"{baseLabel}-{quoteLabel}";
                 var contractMultiplier = 1;
                 // default value for minimum_price_variation
-                var minimum_price_variation = "0.00001";
+                var minimum_price_variation = "0.00000001";
                 // default value for lot_size
                 var lot_size = "0.00000001";
                 // follow exchange reference format
