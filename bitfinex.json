@@ -15,6 +15,7 @@
     "order-types": [ "Market", "Limit", "Limit-If-Touched", "Stop Market", "Stop Limit", "Market On Open", "Market On Close" ],
     "assets": [ "Crypto Spot" ],
     "brokerage-url": "https://www.bitfinex.com/",
+    "landing-page-url": "/brokerages/bitfinex",
     "documentation": "/docs/v2/cloud-platform/live-trading/brokerages/bitfinex",
     "module-specification": {
         "download": {
