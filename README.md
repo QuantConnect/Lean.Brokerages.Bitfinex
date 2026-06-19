@@ -83,7 +83,7 @@ Follow these steps to start local live trading with the Bitfinex brokerage:
     API secret: *******************************************
     ```
 
-    To create new API credentials, see the [API Management page](https://support.bitfinex.com/hc/en-us/articles/115003363429-How-to-create-and-revoke-a-Bitfinex-API-Key) on the Bitfinex website.
+    To create new API credentials, see [How to create and revoke a Bitfinex API Key](https://support.bitfinex.com/hc/en-us/articles/115003363429-How-to-create-and-revoke-a-Bitfinex-API-Key) on the Bitfinex website.
 
 5.  Enter the number of the data feed to use and then follow the steps required for the data connection.
 
