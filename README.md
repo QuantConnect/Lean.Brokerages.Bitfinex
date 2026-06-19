@@ -22,7 +22,7 @@ This repository hosts the Bitfinex Brokerage Plugin Integration with the QuantCo
 
 [Bitfinex](https://www.bitfinex.com/) was founded by Giancarlo Devasini and Raphael Nicolle in 2012 with the goal to "give our users the ultimate cryptocurrency trading experience". Bitfinex provides access to trading Crypto for clients outside [prohibited jurisdictions](https://www.bitfinex.com/legal/exchange/terms) with no minimum deposit to set up an account. If you fund your account with fiat currency, they enforce a [10,000 minimum](https://support.bitfinex.com/hc/en-us/articles/360023357574-Bank-Wire-Deposit-) for USD, EUR, and GBP. However, if you fund your account with Crypto, they do not enforce a minimum deposit. Bitfinex also provides Crypto staking, a mobile app, and an unrealized profit leaderboard for the traders on the platform. Bitfinex has always been at the forefront of technological innovation in digital asset trading.
 
-For more information about the Bitfinex brokerage, see the [QuantConnect-Bitfinex Integration Page](https://www.quantconnect.com/docs/v2/our-platform/live-trading/brokerages/bitfinex).
+For more information about the Bitfinex brokerage, see the [QuantConnect-Bitfinex Integration Page](https://www.quantconnect.com/docs/v2/cloud-platform/live-trading/brokerages/bitfinex).
 
 ## Using the Brokerage Plugin
   
@@ -38,7 +38,7 @@ For more information about the Bitfinex brokerage, see the [QuantConnect-Bitfine
 
 Follow these steps to start local live trading with the Bitfinex brokerage:
 
-1.  Open a terminal in your [CLI root directory](https://www.quantconnect.com/docs/v2/lean-cli/initialization/directory-structure#02-lean-init).
+1.  Open a terminal in your [organization workspace](https://www.quantconnect.com/docs/v2/lean-cli/initialization/organization-workspaces).
 2.  Run `lean live "<projectName>`" to start a live deployment wizard for the project in ./`<projectName>` and then enter the brokerage number.
 
     ```
@@ -83,7 +83,7 @@ Follow these steps to start local live trading with the Bitfinex brokerage:
     API secret: *******************************************
     ```
 
-    To create new API credentials, see the [API Management page](https://www.bitfinex.com/api) on the Bitfinex website.
+    To create new API credentials, see [How to create and revoke a Bitfinex API Key](https://support.bitfinex.com/hc/en-us/articles/115003363429-How-to-create-and-revoke-a-Bitfinex-API-Key) on the Bitfinex website.
 
 5.  Enter the number of the data feed to use and then follow the steps required for the data connection.
 
@@ -109,7 +109,7 @@ Follow these steps to start local live trading with the Bitfinex brokerage:
     To enter multiple options, separate them with comma:
     ```
 
-    If you select Polygon Data Feed, see [Polygon](https://www.quantconnect.com/docs/v2/lean-cli/live-trading/other-data-feeds/polygon) for set up instructions.
+    If you select Polygon Data Feed, see [Polygon](https://www.quantconnect.com/docs/v2/lean-cli/live-trading/data-providers/polygon) for set up instructions.
 
 6. View the result in the `<projectName>live<timestamp>` directory. Results are stored in real-time in JSON format. You can save results to a different directory by providing the `--output <path>` option in step 2.
 
@@ -147,7 +147,7 @@ You can set the Brokerage Model with the following statements
     SetBrokerageModel(BrokerageName.Bitfinex, AccountType.Cash);
     SetBrokerageModel(BrokerageName.Bitfinex, AccountType.Margin);
 
-[Read Documentation](https://www.quantconnect.com/docs/v2/our-platform/live-trading/brokerages/bitfinex)
+[Read Documentation](https://www.quantconnect.com/docs/v2/cloud-platform/live-trading/brokerages/bitfinex)
 
 ### Fees
 
